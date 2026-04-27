@@ -62,7 +62,8 @@ def login_page():
             conn.execute("UPDATE usuarios SET ultimo_acceso=? WHERE id=?",
                         (datetime.now().isoformat(), u["id"]))
             conn.commit()
-            return jsonify({"ok": True, "nombre": u["nombre"], "rol": u["rol"]})
+            return jsonify({"ok": True, "nombre": u["ndef index():
+    return send_from_directory("static", "login.html")ombre"], "rol": u["rol"]})
         return jsonify({"ok": False, "msg": "Email o contraseña incorrectos"}), 401
     return send_from_directory("static", "login.html")
 
