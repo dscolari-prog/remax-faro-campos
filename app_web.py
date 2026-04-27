@@ -51,7 +51,7 @@ def login_page():
             login_user(user, remember=True)
             return jsonify({"ok": True, "nombre": u["nombre"]})
         return jsonify({"ok": False, "msg": "Email o contraseña incorrectos"}), 401
-    return send_from_directory("static", "login.html")
+    return send_from_directory("static", "index.html")
 
 @app.route("/logout")
 def logout():
