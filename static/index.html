@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RE/MAX FARO — Campo Track</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c1:#1B3D6E;--c2:#E8A020;--c3:#2D6A4F;
+  --bg:#f5f4f0;--card:#fff;--border:rgba(0,0,0,.1);
+  --text:#1a1a18;--muted:#888;--rad:10px
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:13px}
+
+/* HEADER */
+.hdr{background:var(--c1);color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.badge{background:var(--c2);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+.hdr-title{font-size:16px;font-weight:500}
+.hdr-sub{font-size:10px;opacity:.6;margin-top:1px}
+.hdr-stats{display:flex;gap:16px}
+.hs{text-align:center}
+.hs-n{font-size:18px;font-weight:500;color:var(--c2)}
+.hs-l{font-size:9px;opacity:.6;text-transform:uppercase;letter-spacing:.4px}
+
+/* NAV */
+.nav{background:var(--card);border-bottom:0.5px solid var(--border);display:flex;padding:0 18px;overflow-x:auto}
+.ntab{padding:10px 16px;font-size:12px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.ntab:hover{color:var(--text)}
+.ntab.on{color:var(--c1);border-bottom-color:var(--c1);font-weight:500}
+
+/* PANELS */
+.panel{display:none;padding:14px 18px}
+.panel.on{display:block}
+
+/* FILTERS */
+.fbar{background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);padding:12px 14px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:3px}
+.fg label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:500}
+.fg select,.fg input{border:0.5px solid rgba(0,0,0,.2);border-radius:6px;padding:6px 9px;font-size:12px;background:#f8f7f3;color:var(--text);outline:none}
+.fg select:focus,.fg input:focus{border-color:var(--c1)}
+.btn{padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:none}
+.btn-p{background:var(--c1);color:#fff}
+.btn-s{background:#f0efe8;color:var(--text);border:0.5px solid rgba(0,0,0,.15)}
+.btn-a{background:var(--c2);color:#fff}
+.btn-sm{padding:4px 9px;font-size:11px}
+
+/* RESULTS BAR */
+.rbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.rcnt{font-size:12px;color:var(--muted)}
+.rcnt strong{color:var(--text)}
+.vtgl{display:flex;gap:3px}
+.vb{padding:4px 10px;border:0.5px solid rgba(0,0,0,.15);background:transparent;border-radius:5px;font-size:11px;cursor:pointer;color:var(--muted)}
+.vb.on{background:var(--c1);color:#fff;border-color:var(--c1)}
+
+/* CARDS */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.ccard{background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);overflow:hidden;cursor:pointer;transition:border-color .15s}
+.ccard:hover{border-color:var(--c1)}
+.ch{padding:10px 12px;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
+.ctipo{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;padding:2px 6px;border-radius:3px;display:inline-block;margin-bottom:3px}
+.ta{background:#EAF3DE;color:#27500A}.tg{background:#FAEEDA;color:#633806}
+.tm{background:#E6F1FB;color:#0C447C}.tt{background:#FBEAF0;color:#72243E}
+.tf{background:#E1F5EE;color:#085041}
+.ctit{font-size:13px;font-weight:500}
+.cloc{font-size:11px;color:var(--muted);margin-top:1px}
+.cpv{font-size:14px;font-weight:500;color:var(--c3);text-align:right}
+.cpha{font-size:10px;color:var(--muted);text-align:right}
+.cb{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.cs .sl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.cs .sv{font-size:12px;font-weight:500}
+.cf{padding:8px 12px;border-top:0.5px solid var(--border);display:flex;gap:5px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.sbadge{font-size:9px;padding:2px 5px;border-radius:3px;background:#f0efe8;color:var(--muted)}
+.obadge{font-size:9px;padding:2px 5px;border-radius:3px;background:#FCEBEB;color:#A32D2D;font-weight:600}
+.capbadge{font-size:9px;padding:2px 5px;border-radius:3px;background:#EAF3DE;color:#27500A;font-weight:600}
+.gdot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:2px;vertical-align:middle}
+.gok{background:#1D9E75}.gno{background:#aaa}
+
+/* TABLE */
+.twrap{overflow-x:auto}
+.ctable{width:100%;border-collapse:collapse;font-size:12px;min-width:800px;table-layout:fixed}
+.ctable th{background:#f0efe8;padding:8px 10px;text-align:left;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:0.5px solid rgba(0,0,0,.15)}
+.ctable td{padding:8px 10px;border-bottom:0.5px solid var(--border);vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctable tr:hover td{background:#f8f7f3}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.scard{background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);padding:12px}
+.sc-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.sc-v{font-size:24px;font-weight:500}
+.sc-s{font-size:10px;color:var(--muted);margin-top:2px}
+.crow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cchart{background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);padding:12px}
+.ctitle{font-size:12px;font-weight:500;margin-bottom:10px}
+.brow{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.blbl{width:100px;text-align:right;color:var(--muted);font-size:10px;flex-shrink:0}
+.btrack{flex:1;height:18px;background:#f0efe8;border-radius:3px;overflow:hidden}
+.bfill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:5px;font-size:9px;font-weight:600;color:#fff}
+.bval{width:30px;font-size:10px;font-weight:500;flex-shrink:0}
+
+/* CRM */
+.crmgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.crmc{background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);padding:12px}
+.crmt{font-size:12px;font-weight:500;margin-bottom:10px;padding-bottom:8px;border-bottom:0.5px solid var(--border)}
+.pipeline{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.pstage{flex:1;min-width:70px;padding:7px 6px;border-radius:6px;text-align:center;border:0.5px solid}
+.pstage .pn{font-size:16px;font-weight:500}
+.pstage .pl{font-size:9px;text-transform:uppercase;letter-spacing:.3px;margin-top:1px}
+.pp{background:#E6F1FB;border-color:#B5D4F4;color:#0C447C}
+.pc{background:#FAEEDA;border-color:#FAC775;color:#633806}
+.pv{background:#E1F5EE;border-color:#9FE1CB;color:#085041}
+.pr{background:#EEEDFE;border-color:#CECBF6;color:#3C3489}
+.pk{background:#EAF3DE;border-color:#C0DD97;color:#27500A}
+.plist{display:flex;flex-direction:column;gap:7px}
+.pitem{border:0.5px solid var(--border);border-radius:8px;padding:9px 11px;display:flex;justify-content:space-between;align-items:center}
+.pi-n{font-size:12px;font-weight:500}
+.pi-c{font-size:10px;color:var(--muted)}
+.spill{font-size:9px;padding:2px 6px;border-radius:10px;font-weight:500}
+.sp1{background:#FAEEDA;color:#633806}.sp2{background:#E1F5EE;color:#085041}
+.sp3{background:#EEEDFE;color:#3C3489}.sp0{background:#E6F1FB;color:#0C447C}
+
+/* FUENTES */
+.srclist{display:flex;flex-direction:column;gap:6px}
+.srci{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border:0.5px solid var(--border);border-radius:6px}
+.si-n{font-size:12px;font-weight:500}
+.si-u{font-size:9px;color:var(--muted)}
+.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sd-ok{background:#1D9E75}.sd-pen{background:#EF9F27}.sd-err{background:#E24B4A}
+
+/* MAP */
+.mapgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.mpin{background:var(--card);border:0.5px solid var(--border);border-radius:8px;padding:9px 11px;display:flex;align-items:center;gap:9px;cursor:pointer}
+.mpin:hover{border-color:var(--c1)}
+.pdot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.pname{font-size:12px;font-weight:500}
+.pcoords{font-size:10px;color:var(--muted)}
+
+/* MODAL */
+.mwrap{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
+.mwrap.on{opacity:1;pointer-events:all}
+.modal{background:var(--card);border-radius:var(--rad);width:92%;max-width:560px;max-height:88vh;overflow-y:auto}
+.mhead{padding:14px 18px;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card)}
+.mhead h2{font-size:15px;font-weight:500}
+.mclose{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted)}
+.mbody{padding:16px 18px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.di-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.di-v{font-size:13px;font-weight:500;margin-top:2px}
+.mact{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:0.5px solid var(--border)}
+
+/* LOGOUT */
+.logout-btn{background:rgba(255,255,255,.15);color:#fff;border:0.5px solid rgba(255,255,255,.3);padding:5px 12px;border-radius:5px;font-size:11px;cursor:pointer}
+.logout-btn:hover{background:rgba(255,255,255,.25)}
+
+/* USER BADGE */
+.user-info{display:flex;align-items:center;gap:8px;color:#fff;font-size:12px}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:var(--c2);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px}
+
+@media(max-width:540px){
+  .sgrid{grid-template-columns:1fr 1fr}
+  .crow,.crmgrid{grid-template-columns:1fr}
+  .dgrid{grid-template-columns:1fr}
+  .hdr-stats{gap:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="badge">RE/MAX</span><span class="hdr-title">FARO — Campo Track</span></div>
+      <div class="hdr-sub">Inteligencia inmobiliaria rural · Santa Fe · 35 portales</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <div class="hdr-stats">
+      <div class="hs"><div class="hs-n" id="hs-t">—</div><div class="hs-l">Campos</div></div>
+      <div class="hs"><div class="hs-n" id="hs-dv">—</div><div class="hs-l">Dueño vende</div></div>
+      <div class="hs"><div class="hs-n" id="hs-c">—</div><div class="hs-l">Captados</div></div>
+    </div>
+    <div class="user-info">
+      <div class="user-avatar" id="uavatar">D</div>
+      <span id="uname">Diego</span>
+      <button class="logout-btn" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="ntab on" onclick="tab('listado',this)">Listado</div>
+  <div class="ntab" onclick="tab('mapa',this)">Mapa</div>
+  <div class="ntab" onclick="tab('crm',this)">CRM</div>
+  <div class="ntab" onclick="tab('stats',this)">Estadísticas</div>
+  <div class="ntab" onclick="tab('fuentes',this)">Fuentes (35)</div>
+</div>
+
+<!-- LISTADO -->
+<div id="p-listado" class="panel on">
+  <div class="fbar">
+    <div class="fg" style="flex:1;min-width:140px"><label>Buscar</label><input type="text" id="q" placeholder="Nombre, zona, localidad..." oninput="fil()"></div>
+    <div class="fg"><label>Tipo</label><select id="f-tipo" onchange="fil()"><option value="">Todos</option><option>Agrícola</option><option>Ganadero</option><option>Mixto</option><option>Tambero</option><option>Forestal</option></select></div>
+    <div class="fg"><label>Ha mín.</label><input type="number" id="f-hmin" placeholder="0" oninput="fil()" style="width:80px"></div>
+    <div class="fg"><label>Ha máx.</label><input type="number" id="f-hmax" placeholder="∞" oninput="fil()" style="width:80px"></div>
+    <div class="fg"><label>Zona</label><select id="f-zona" onchange="fil()"><option value="">Todas</option><option>Norte SF</option><option>Centro SF</option><option>Sur SF</option><option>Este SF</option><option>Oeste SF</option></select></div>
+    <div class="fg"><label>Dueño vende</label><select id="f-dv" onchange="fil()"><option value="">Todos</option><option value="si">Solo dueño vende</option><option value="no">Con inmobiliaria</option></select></div>
+    <div class="fg"><label>Captado</label><select id="f-cap" onchange="fil()"><option value="">Todos</option><option value="si">Captados</option><option value="no">Sin captar</option></select></div>
+    <div style="display:flex;gap:6px;align-self:flex-end">
+      <button class="btn btn-p" onclick="fil()">Filtrar</button>
+      <button class="btn btn-s" onclick="clearFil()">Limpiar</button>
+      <button class="btn btn-a" onclick="addCampo()">+ Campo</button>
+    </div>
+  </div>
+  <div class="rbar">
+    <div class="rcnt"><strong id="rn">—</strong> campos · <span id="last-update" style="color:#1D9E75;font-weight:500">Cargando...</span></div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <select style="font-size:11px;padding:4px 8px;border:0.5px solid rgba(0,0,0,.15);border-radius:5px;background:#f8f7f3" onchange="sortC(this.value)">
+        <option value="fecha">Más recientes</option>
+        <option value="ha_desc">Más hectáreas</option>
+        <option value="ha_asc">Menos hectáreas</option>
+        <option value="precio_desc">Mayor precio</option>
+        <option value="dv">Dueño vende primero</option>
+      </select>
+      <div class="vtgl">
+        <button class="vb on" id="vb-c" onclick="setV('cards')">Tarjetas</button>
+        <button class="vb" id="vb-t" onclick="setV('table')">Tabla</button>
+      </div>
+    </div>
+  </div>
+  <div id="v-cards" class="cgrid"></div>
+  <div id="v-table" style="display:none"><div class="twrap"><table class="ctable">
+    <thead><tr>
+      <th style="width:22%">Campo</th><th style="width:9%">Tipo</th><th style="width:12%">Zona</th>
+      <th style="width:8%">Ha</th><th style="width:13%">Precio</th><th style="width:9%">USD/Ha</th>
+      <th style="width:7%">Dueño</th><th style="width:11%">Fuente</th><th style="width:5%">Geo</th><th style="width:4%"></th>
+    </tr></thead>
+    <tbody id="ctbody"></tbody>
+  </table></div></div>
+</div>
+
+<!-- MAPA -->
+<div id="p-mapa" class="panel">
+  <div style="background:var(--card);border:0.5px solid var(--border);border-radius:var(--rad);padding:12px;margin-bottom:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--muted)">Campos geolocalizados. Para mapa satelital real, integrá Google Maps API.</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <span style="background:#EAF3DE;color:#27500A;font-size:10px;padding:2px 7px;border-radius:4px" id="geo-count">— geolocalizados</span>
+      <span style="background:#FCEBEB;color:#A32D2D;font-size:10px;padding:2px 7px;border-radius:4px">Rojo = dueño vende</span>
+    </div>
+  </div>
+  <div class="mapgrid" id="mapgrid"></div>
+</div>
+
+<!-- CRM -->
+<div id="p-crm" class="panel">
+  <div class="crmgrid">
+    <div>
+      <div style="font-size:14px;font-weight:500;margin-bottom:10px">Pipeline de captación</div>
+      <div class="pipeline">
+        <div class="pstage pp"><div class="pn">12</div><div class="pl">Prospectos</div></div>
+        <div class="pstage pc"><div class="pn">8</div><div class="pl">Contactados</div></div>
+        <div class="pstage pv"><div class="pn">4</div><div class="pl">Visita</div></div>
+        <div class="pstage pr"><div class="pn">3</div><div class="pl">Propuesta</div></div>
+        <div class="pstage pk"><div class="pn">6</div><div class="pl">Captados</div></div>
+      </div>
+      <div class="crmc">
+        <div class="crmt">Prospectos activos — Dueño vende</div>
+        <div class="plist">
+          <div class="pitem"><div><div class="pi-n">Juan Peralta</div><div class="pi-c">Est. San Jorge · Hace 2 días</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="spill sp1">Contactado</span><button class="btn btn-s btn-sm">Mensaje</button></div></div>
+          <div class="pitem"><div><div class="pi-n">Roberto Méndez</div><div class="pi-c">Campo La Esperanza · Hoy</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="spill sp2">Visita agend.</span><button class="btn btn-s btn-sm">Mensaje</button></div></div>
+          <div class="pitem"><div><div class="pi-n">María Suárez</div><div class="pi-c">Tambo La Primavera · Hace 5 días</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="spill sp3">Propuesta</span><button class="btn btn-s btn-sm">Mensaje</button></div></div>
+          <div class="pitem"><div><div class="pi-n">Carlos Ibáñez</div><div class="pi-c">Est. Don Segundo · Ayer</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="spill sp0">Prospecto</span><button class="btn btn-s btn-sm">Mensaje</button></div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="crmc" style="margin-bottom:10px">
+        <div class="crmt">Registrar acción</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div class="fg" style="width:100%"><label>Campo / Propietario</label><input type="text" placeholder="Nombre..." style="width:100%"></div>
+          <div class="fg" style="width:100%"><label>Acción</label><select style="width:100%"><option>Primer contacto telefónico</option><option>Visita al campo</option><option>Envío propuesta comercial</option><option>Seguimiento WhatsApp</option><option>Reunión presencial</option></select></div>
+          <div class="fg" style="width:100%"><label>Nota</label><input type="text" placeholder="Observaciones..." style="width:100%"></div>
+          <button class="btn btn-p" style="width:100%" onclick="alert('Acción registrada.')">Registrar acción</button>
+        </div>
+      </div>
+      <div class="crmc">
+        <div class="crmt">Estrategia captación dueño vende</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;line-height:1.6;color:var(--muted)">
+          <div style="display:flex;gap:6px"><span style="background:#E6F1FB;color:#0C447C;font-size:9px;padding:1px 6px;border-radius:3px;flex-shrink:0;margin-top:2px">1</span><span>Identificar campos con badge rojo "DUEÑO VENDE".</span></div>
+          <div style="display:flex;gap:6px"><span style="background:#FAEEDA;color:#633806;font-size:9px;padding:1px 6px;border-radius:3px;flex-shrink:0;margin-top:2px">2</span><span>Primer contacto: presentación RE/MAX FARO + estadísticas del mercado rural SF.</span></div>
+          <div style="display:flex;gap:6px"><span style="background:#E1F5EE;color:#085041;font-size:9px;padding:1px 6px;border-radius:3px;flex-shrink:0;margin-top:2px">3</span><span>Tasación profesional gratuita y comparativa de precios por zona.</span></div>
+          <div style="display:flex;gap:6px"><span style="background:#EEEDFE;color:#3C3489;font-size:9px;padding:1px 6px;border-radius:3px;flex-shrink:0;margin-top:2px">4</span><span>Visita al campo + presentación del plan de marketing rural RE/MAX.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ESTADÍSTICAS -->
+<div id="p-stats" class="panel">
+  <div class="sgrid" id="sgrid"></div>
+  <div class="crow">
+    <div class="cchart"><div class="ctitle">Por tipo</div><div id="ch-tipo"></div></div>
+    <div class="cchart"><div class="ctitle">Por zona</div><div id="ch-zona"></div></div>
+    <div class="cchart"><div class="ctitle">Por fuente</div><div id="ch-fuente"></div></div>
+    <div class="cchart"><div class="ctitle">Rango de hectáreas</div><div id="ch-ha"></div></div>
+  </div>
+</div>
+
+<!-- FUENTES -->
+<div id="p-fuentes" class="panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="crmc">
+      <div class="crmt">35 portales configurados</div>
+      <div class="srclist" id="srclist"></div>
+    </div>
+    <div class="crmc">
+      <div class="crmt">Resumen de scraping</div>
+      <div style="font-size:12px;line-height:1.8;color:var(--muted)">
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--border)"><span>Última ejecución</span><span style="font-weight:500;color:var(--text)">Hoy 07:00 hs</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--border)"><span>Portales nacionales</span><span style="font-weight:500;color:var(--text)">7</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--border)"><span>Portales rurales especializados</span><span style="font-weight:500;color:var(--text)">11</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--border)"><span>Inmobiliarias locales SF</span><span style="font-weight:500;color:var(--text)">10</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--border)"><span>Diarios locales</span><span style="font-weight:500;color:var(--text)">2</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0"><span>Próxima ejecución</span><span style="font-weight:500;color:#1D9E75">Mañana 07:00 hs</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mwrap" id="mwrap" onclick="closeMod(event)">
+  <div class="modal">
+    <div class="mhead"><h2 id="mtit">Detalle</h2><button class="mclose" onclick="closeMod2()">×</button></div>
+    <div class="mbody" id="mbody"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA — se carga desde la API del servidor
+// ============================================================
+let CAMPOS = [];
+let fil_data = [];
+
+// Datos de demo para cuando la API no tenga campos aún
+const DEMO = [
+  {id:1,titulo:"Campo La Esperanza",tipo:"Agrícola",zona:"Norte SF",localidad:"Vera",hectareas:850,precio_usd:2420000,fuente:"Argenprop",url_original:"https://argenprop.com",dueno_vende:1,captado:0,geolocalizdo:1,lat:-29.45,lng:-60.21,descripcion:"Campo agrícola de alta productividad. 95% tierra cultivable. Soja/maíz.",fecha_scraping:"2025-04-10"},
+  {id:2,titulo:"Est. San Jorge",tipo:"Ganadero",zona:"Centro SF",localidad:"Reconquista",hectareas:1200,precio_usd:null,fuente:"Zonaprop",url_original:"https://zonaprop.com.ar",dueno_vende:1,captado:0,geolocalizdo:1,lat:-29.68,lng:-59.64,descripcion:"Establecimiento ganadero con aguadas naturales.",fecha_scraping:"2025-04-08"},
+  {id:3,titulo:"Campo Mixto El Trébol",tipo:"Mixto",zona:"Sur SF",localidad:"Rosario Norte",hectareas:320,precio_usd:960000,fuente:"MercadoLibre",url_original:"https://mercadolibre.com.ar",dueno_vende:0,captado:1,geolocalizdo:1,lat:-32.10,lng:-61.50,descripcion:"Campo mixto con infraestructura completa.",fecha_scraping:"2025-03-28"},
+  {id:4,titulo:"Tambo La Primavera",tipo:"Tambero",zona:"Este SF",localidad:"Rafaela",hectareas:180,precio_usd:720000,fuente:"Rurales.com.ar",url_original:"https://rurales.com.ar",dueno_vende:1,captado:0,geolocalizdo:1,lat:-31.20,lng:-61.48,descripcion:"Tambo en plena producción. 180 vacas en ordeñe.",fecha_scraping:"2025-04-15"},
+  {id:5,titulo:"Campo Forestal Norte",tipo:"Forestal",zona:"Norte SF",localidad:"Calchaquí",hectareas:2400,precio_usd:null,fuente:"CampoArgentino",url_original:"https://campoargentino.com",dueno_vende:0,captado:0,geolocalizdo:0,lat:null,lng:null,descripcion:"Explotación forestal con eucaliptos y pinos.",fecha_scraping:"2025-04-01"},
+  {id:6,titulo:"Estancia Don Segundo",tipo:"Ganadero",zona:"Oeste SF",localidad:"Ceres",hectareas:3200,precio_usd:6400000,fuente:"Carga Manual",url_original:null,dueno_vende:1,captado:0,geolocalizdo:1,lat:-29.88,lng:-61.95,descripcion:"Gran estancia ganadera. Raza Hereford.",fecha_scraping:"2025-04-18"},
+  {id:7,titulo:"Tambo Los Álamos",tipo:"Tambero",zona:"Centro SF",localidad:"Esperanza",hectareas:240,precio_usd:null,fuente:"Rurales.com.ar",url_original:"https://rurales.com.ar",dueno_vende:1,captado:1,geolocalizdo:1,lat:-31.45,lng:-60.93,descripcion:"Tambo con sala 2x10. 220 VO.",fecha_scraping:"2025-04-14"},
+  {id:8,titulo:"Lote Agrícola Franck",tipo:"Agrícola",zona:"Centro SF",localidad:"Franck",hectareas:150,precio_usd:525000,fuente:"Argenprop",url_original:"https://argenprop.com",dueno_vende:1,captado:1,geolocalizdo:1,lat:-31.63,lng:-60.92,descripcion:"Lote agrícola. Excelente acceso.",fecha_scraping:"2025-04-19"},
+  {id:9,titulo:"Campo Ganadero Norte",tipo:"Ganadero",zona:"Norte SF",localidad:"Vera Norte",hectareas:780,precio_usd:null,fuente:"Mercado Único",url_original:"https://mercadounico.com",dueno_vende:1,captado:0,geolocalizdo:1,lat:-29.10,lng:-60.40,descripcion:"Campo ganadero con monte natural.",fecha_scraping:"2025-04-21"},
+  {id:10,titulo:"Campo Zona Núcleo",tipo:"Agrícola",zona:"Sur SF",localidad:"Venado Tuerto",hectareas:540,precio_usd:1944000,fuente:"RAES",url_original:"https://raes.com.ar",dueno_vende:0,captado:1,geolocalizdo:1,lat:-33.74,lng:-61.96,descripcion:"Lote de primera calidad. Rinde 40qq soja.",fecha_scraping:"2025-04-12"},
+];
+
+// ============================================================
+// INIT — cargar datos desde API
+// ============================================================
+async function init(){
+  try {
+    const r = await fetch('/api/campos');
+    if(r.ok){
+      const d = await r.json();
+      CAMPOS = d.campos && d.campos.length > 0 ? d.campos : DEMO;
+    } else {
+      CAMPOS = DEMO;
+    }
+  } catch(e){
+    CAMPOS = DEMO;
+  }
+  fil_data = [...CAMPOS];
+  render();
+  updateHeader();
+  document.getElementById('last-update').textContent = 'Actualizado hoy 07:30 hs';
+
+  // Cargar estadísticas desde API
+  try {
+    const r = await fetch('/api/estadisticas');
+    if(r.ok){
+      const s = await r.json();
+      document.getElementById('hs-t').textContent = s.total || CAMPOS.length;
+      document.getElementById('hs-dv').textContent = s.dueno_vende || CAMPOS.filter(c=>c.dueno_vende).length;
+      document.getElementById('hs-c').textContent = s.captados || CAMPOS.filter(c=>c.captado).length;
+    }
+  } catch(e){}
+}
+
+function updateHeader(){
+  document.getElementById('hs-t').textContent = CAMPOS.length;
+  document.getElementById('hs-dv').textContent = CAMPOS.filter(c=>c.dueno_vende).length;
+  document.getElementById('hs-c').textContent = CAMPOS.filter(c=>c.captado).length;
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function fmtP(p){return p?'USD '+Number(p).toLocaleString('es-AR'):'A convenir'}
+function fmtPH(p,h){return p&&h?'USD '+Math.round(p/h).toLocaleString('es-AR')+'/ha':'-'}
+function tcls(t){return{Agrícola:'ta',Ganadero:'tg',Mixto:'tm',Tambero:'tt',Forestal:'tf'}[t]||'tm'}
+
+// ============================================================
+// FILTERS
+// ============================================================
+function fil(){
+  const q=document.getElementById('q').value.toLowerCase();
+  const tipo=document.getElementById('f-tipo').value;
+  const hmin=parseFloat(document.getElementById('f-hmin').value)||0;
+  const hmax=parseFloat(document.getElementById('f-hmax').value)||999999;
+  const zona=document.getElementById('f-zona').value;
+  const dv=document.getElementById('f-dv').value;
+  const cap=document.getElementById('f-cap').value;
+  fil_data=CAMPOS.filter(c=>{
+    const txt=[c.titulo,c.localidad,c.zona,c.descripcion||''].join(' ').toLowerCase();
+    if(q&&!txt.includes(q))return false;
+    if(tipo&&c.tipo!==tipo)return false;
+    if(c.hectareas<hmin||c.hectareas>hmax)return false;
+    if(zona&&c.zona!==zona)return false;
+    if(dv==='si'&&!c.dueno_vende)return false;
+    if(dv==='no'&&c.dueno_vende)return false;
+    if(cap==='si'&&!c.captado)return false;
+    if(cap==='no'&&c.captado)return false;
+    return true;
+  });
+  render();
+}
+
+function clearFil(){
+  ['q','f-hmin','f-hmax'].forEach(id=>document.getElementById(id).value='');
+  ['f-tipo','f-zona','f-dv','f-cap'].forEach(id=>document.getElementById(id).value='');
+  fil_data=[...CAMPOS];render();
+}
+
+function sortC(v){
+  if(v==='ha_desc')fil_data.sort((a,b)=>b.hectareas-a.hectareas);
+  else if(v==='ha_asc')fil_data.sort((a,b)=>a.hectareas-b.hectareas);
+  else if(v==='precio_desc')fil_data.sort((a,b)=>(b.precio_usd||0)-(a.precio_usd||0));
+  else if(v==='dv')fil_data.sort((a,b)=>b.dueno_vende-a.dueno_vende);
+  else fil_data.sort((a,b)=>(b.fecha_scraping||'').localeCompare(a.fecha_scraping||''));
+  render();
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render(){
+  document.getElementById('rn').textContent=fil_data.length;
+  document.getElementById('v-cards').innerHTML=fil_data.map(c=>`
+    <div class="ccard" onclick="openDet(${c.id})">
+      <div class="ch">
+        <div>
+          <span class="ctipo ${tcls(c.tipo)}">${c.tipo}</span>
+          <div class="ctit">${c.titulo}</div>
+          <div class="cloc"><span class="gdot ${c.geolocalizdo?'gok':'gno'}"></span>${c.localidad||'Sin datos'}</div>
+        </div>
+        <div><div class="cpv">${fmtP(c.precio_usd)}</div><div class="cpha">${fmtPH(c.precio_usd,c.hectareas)}</div></div>
+      </div>
+      <div class="cb">
+        <div class="cs"><span class="sl">Hectáreas</span><span class="sv">${Number(c.hectareas||0).toLocaleString('es-AR')} ha</span></div>
+        <div class="cs"><span class="sl">Zona</span><span class="sv">${c.zona||'—'}</span></div>
+        <div class="cs"><span class="sl">Publicado</span><span class="sv">${(c.fecha_scraping||'').substring(0,10)}</span></div>
+        <div class="cs"><span class="sl">Fuente</span><span class="sv">${c.fuente||'—'}</span></div>
+      </div>
+      <div class="cf">
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <span class="sbadge">${c.fuente||'—'}</span>
+          ${c.dueno_vende?'<span class="obadge">DUEÑO VENDE</span>':''}
+          ${c.captado?'<span class="capbadge">CAPTADO</span>':''}
+        </div>
+        ${c.url_original?`<a href="${c.url_original}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:var(--c1);text-decoration:none">Ver original →</a>`:'<span style="font-size:10px;color:var(--muted)">Carga manual</span>'}
+      </div>
+    </div>
+  `).join('')||'<div style="padding:40px;text-align:center;color:var(--muted)">No se encontraron campos con esos filtros</div>';
+
+  document.getElementById('ctbody').innerHTML=fil_data.map(c=>`
+    <tr>
+      <td title="${c.titulo}"><strong>${c.titulo}</strong><br><span style="font-size:10px;color:var(--muted)">${c.localidad||'—'}</span></td>
+      <td><span class="ctipo ${tcls(c.tipo)}">${c.tipo}</span></td>
+      <td>${c.zona||'—'}</td>
+      <td>${Number(c.hectareas||0).toLocaleString('es-AR')}</td>
+      <td style="font-weight:500">${fmtP(c.precio_usd)}</td>
+      <td>${fmtPH(c.precio_usd,c.hectareas)}</td>
+      <td>${c.dueno_vende?'<span class="obadge">SÍ</span>':'-'}</td>
+      <td title="${c.fuente}">${(c.fuente||'—').substring(0,14)}</td>
+      <td><span class="gdot ${c.geolocalizdo?'gok':'gno'}" style="display:inline-block"></span></td>
+      <td><button class="btn btn-s btn-sm" onclick="openDet(${c.id})">Ver</button></td>
+    </tr>
+  `).join('');
+}
+
+function setV(v){
+  document.getElementById('v-cards').style.display=v==='cards'?'grid':'none';
+  document.getElementById('v-table').style.display=v==='table'?'block':'none';
+  document.getElementById('vb-c').classList.toggle('on',v==='cards');
+  document.getElementById('vb-t').classList.toggle('on',v==='table');
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function tab(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('p-'+id).classList.add('on');
+  el.classList.add('on');
+  if(id==='mapa')renderMapa();
+  if(id==='stats')renderStats();
+  if(id==='fuentes')renderFuentes();
+}
+
+// ============================================================
+// MAPA
+// ============================================================
+function renderMapa(){
+  const geo=CAMPOS.filter(c=>c.geolocalizdo&&c.lat);
+  document.getElementById('geo-count').textContent=geo.length+' geolocalizados';
+  document.getElementById('mapgrid').innerHTML=geo.map(c=>`
+    <div class="mpin" onclick="openDet(${c.id})">
+      <div class="pdot" style="background:${c.dueno_vende?'#E24B4A':c.tipo==='Agrícola'?'#1D9E75':c.tipo==='Ganadero'?'#EF9F27':c.tipo==='Tambero'?'#D4537E':'#378ADD'}"></div>
+      <div>
+        <div class="pname">${c.titulo}</div>
+        <div class="pcoords">${c.hectareas} ha · ${c.localidad||'—'}</div>
+        <div class="pcoords" style="font-size:9px">${Number(c.lat).toFixed(3)}, ${Number(c.lng).toFixed(3)}</div>
+      </div>
+      ${c.dueno_vende?'<span class="obadge" style="margin-left:auto">DV</span>':''}
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// ESTADÍSTICAS
+// ============================================================
+function renderStats(){
+  const total=CAMPOS.length;
+  const ha=CAMPOS.reduce((s,c)=>s+(c.hectareas||0),0);
+  const precios=CAMPOS.filter(c=>c.precio_usd&&c.hectareas).map(c=>c.precio_usd/c.hectareas);
+  const promHa=precios.length?Math.round(precios.reduce((a,b)=>a+b,0)/precios.length):0;
+  const dv=CAMPOS.filter(c=>c.dueno_vende).length;
+  document.getElementById('sgrid').innerHTML=`
+    <div class="scard"><div class="sc-l">Total campos</div><div class="sc-v">${total}</div><div class="sc-s">en la plataforma</div></div>
+    <div class="scard"><div class="sc-l">Ha relevadas</div><div class="sc-v">${Math.round(ha).toLocaleString('es-AR')}</div><div class="sc-s">Prov. Santa Fe</div></div>
+    <div class="scard"><div class="sc-l">Precio prom. USD/Ha</div><div class="sc-v">${promHa.toLocaleString('es-AR')}</div><div class="sc-s">campos con precio</div></div>
+    <div class="scard"><div class="sc-l">Dueño vende</div><div class="sc-v">${dv}</div><div class="sc-s">${Math.round(dv/total*100)}% del total</div></div>
+  `;
+  const tc={},zc={},fc={},hc={'< 100 ha':0,'100–500 ha':0,'500–1000 ha':0,'> 1000 ha':0};
+  CAMPOS.forEach(c=>{
+    tc[c.tipo]=(tc[c.tipo]||0)+1;
+    zc[c.zona]=(zc[c.zona]||0)+1;
+    fc[c.fuente]=(fc[c.fuente]||0)+1;
+    const h=c.hectareas||0;
+    if(h<100)hc['< 100 ha']++;
+    else if(h<=500)hc['100–500 ha']++;
+    else if(h<=1000)hc['500–1000 ha']++;
+    else hc['> 1000 ha']++;
+  });
+  const tcols={Agrícola:'#1D9E75',Ganadero:'#EF9F27',Mixto:'#378ADD',Tambero:'#D4537E',Forestal:'#534AB7'};
+  const zcols={'Norte SF':'#378ADD','Centro SF':'#1D9E75','Sur SF':'#EF9F27','Este SF':'#D4537E','Oeste SF':'#534AB7'};
+  const hcols={'< 100 ha':'#B5D4F4','100–500 ha':'#378ADD','500–1000 ha':'#185FA5','> 1000 ha':'#0C447C'};
+  barchart('ch-tipo',tc,tcols,total);barchart('ch-zona',zc,zcols,total);
+  barchart('ch-fuente',fc,{},total);barchart('ch-ha',hc,hcols,total);
+}
+
+function barchart(id,data,cols,tot){
+  const s=Object.entries(data).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const mx=s[0]?.[1]||1;
+  document.getElementById(id).innerHTML=s.map(([k,v])=>`
+    <div class="brow">
+      <span class="blbl">${k.length>13?k.substring(0,13)+'…':k}</span>
+      <div class="btrack"><div class="bfill" style="width:${Math.round(v/mx*100)}%;background:${cols[k]||'#378ADD'}">${v}</div></div>
+      <span class="bval">${Math.round(v/tot*100)}%</span>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// FUENTES
+// ============================================================
+function renderFuentes(){
+  const srcs=[
+    {n:'Argenprop',u:'argenprop.com',s:'ok'},{n:'Zonaprop',u:'zonaprop.com.ar',s:'ok'},
+    {n:'MercadoLibre Rural',u:'mercadolibre.com.ar',s:'ok'},{n:'Rurales.com.ar',u:'rurales.com.ar',s:'ok'},
+    {n:'CampoArgentino',u:'campoargentino.com',s:'ok'},{n:'InfoCampo',u:'infocampo.com.ar',s:'ok'},
+    {n:'Agrofy',u:'agrofy.com.ar',s:'ok'},{n:'AgroFit',u:'agrofit.com.ar',s:'ok'},
+    {n:'Mercofield',u:'mercofield.com.ar',s:'ok'},{n:'Mercado Único',u:'mercadounico.com',s:'ok'},
+    {n:'Dircampo',u:'dircampo.com.ar',s:'ok'},{n:'Campo Online',u:'campoonline.com.ar',s:'ok'},
+    {n:'Remate Ganadero',u:'remateganadero.com.ar',s:'ok'},{n:'RE/MAX Nacional',u:'remax.com.ar',s:'ok'},
+    {n:'RAES',u:'raes.com.ar',s:'ok'},{n:'APL Inmobiliaria',u:'aplinmobiliaria.com.ar',s:'ok'},
+    {n:'Sañudo Campo',u:'sañudocampo.com.ar',s:'ok'},{n:'Tizado SF',u:'tizado.com.ar',s:'ok'},
+    {n:'LJ Ramos Rural',u:'ljramos.com.ar',s:'ok'},{n:'Bullrich Campos',u:'bullrichcampos.com.ar',s:'ok'},
+    {n:'Toribio Achával',u:'toribioachavalinmobiliaria.com.ar',s:'ok'},{n:'Neoportal',u:'neoportal.com.ar',s:'ok'},
+    {n:'Properati',u:'properati.com.ar',s:'ok'},{n:'Encuentra24',u:'encuentra24.com.ar',s:'ok'},
+    {n:'Icasas',u:'icasas.com.ar',s:'ok'},{n:'Rodo Inmuebles',u:'rodoinmuebles.com.ar',s:'ok'},
+    {n:'El Litoral Clasif.',u:'clasificados.ellitoral.com',s:'ok'},{n:'La Capital Clasif.',u:'clasificados.lacapital.com.ar',s:'ok'},
+    {n:'InmoBuscador',u:'inmobuscador.com.ar',s:'ok'},{n:'Clasificados La Nación',u:'clasificados.lanacion.com.ar',s:'ok'},
+    {n:'OLX Argentina',u:'olx.com.ar',s:'ok'},{n:'Cushman Rural',u:'cushmanwakefield.com.ar',s:'pen'},
+    {n:'Facebook Marketplace',u:'facebook.com/marketplace',s:'pen'},
+    {n:'Carga Manual',u:'—',s:'ok'},
+  ];
+  document.getElementById('srclist').innerHTML=srcs.map(s=>`
+    <div class="srci">
+      <div><div class="si-n">${s.n}</div><div class="si-u">${s.u}</div></div>
+      <div style="display:flex;align-items:center;gap:5px">
+        <div class="sdot ${s.s==='ok'?'sd-ok':s.s==='pen'?'sd-pen':'sd-err'}"></div>
+        <span style="font-size:10px;color:var(--muted)">${s.s==='ok'?'Activo':'Pendiente'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// MODAL DETALLE
+// ============================================================
+function openDet(id){
+  const c=CAMPOS.find(x=>x.id===id);if(!c)return;
+  document.getElementById('mtit').textContent=c.titulo;
+  document.getElementById('mbody').innerHTML=`
+    <div style="display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap">
+      <span class="ctipo ${tcls(c.tipo)}">${c.tipo}</span>
+      ${c.dueno_vende?'<span class="obadge" style="padding:3px 7px;border-radius:4px;font-size:10px">DUEÑO VENDE — PRIORITARIO</span>':''}
+      ${c.captado?'<span class="capbadge" style="padding:3px 7px;border-radius:4px;font-size:10px">CAPTADO RE/MAX FARO</span>':''}
+    </div>
+    <div class="dgrid">
+      <div><div class="di-l">Localidad</div><div class="di-v">${c.localidad||'—'}</div></div>
+      <div><div class="di-l">Zona</div><div class="di-v">${c.zona||'—'}</div></div>
+      <div><div class="di-l">Hectáreas</div><div class="di-v">${Number(c.hectareas||0).toLocaleString('es-AR')} ha</div></div>
+      <div><div class="di-l">Precio total</div><div class="di-v">${fmtP(c.precio_usd)}</div></div>
+      <div><div class="di-l">USD por hectárea</div><div class="di-v">${fmtPH(c.precio_usd,c.hectareas)}</div></div>
+      <div><div class="di-l">Fuente</div><div class="di-v">${c.fuente||'—'}</div></div>
+      <div><div class="di-l">Geolocalizado</div><div class="di-v">${c.geolocalizdo&&c.lat?'Sí · '+Number(c.lat).toFixed(4)+', '+Number(c.lng).toFixed(4):'Sin coordenadas'}</div></div>
+      <div><div class="di-l">Publicado</div><div class="di-v">${(c.fecha_scraping||'').substring(0,10)}</div></div>
+    </div>
+    <div style="background:#f8f7f3;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.6;margin-bottom:4px">${c.descripcion||'Sin descripción disponible.'}</div>
+    <div class="mact">
+      ${c.url_original?`<a href="${c.url_original}" target="_blank" class="btn btn-s btn-sm">Ver publicación →</a>`:''}
+      ${!c.captado?`<button class="btn btn-a btn-sm" onclick="captarCampo(${c.id});closeMod2()">Iniciar captación</button>`:''}
+      ${c.dueno_vende?`<button class="btn btn-p btn-sm" onclick="alert('Función disponible en la próxima versión')">Mensaje captación</button>`:''}
+    </div>
+  `;
+  document.getElementById('mwrap').classList.add('on');
+}
+
+function captarCampo(id){
+  const c=CAMPOS.find(x=>x.id===id);
+  if(c){c.captado=1;render();updateHeader();alert('Campo marcado como captado.');}
+}
+function closeMod(e){if(e.target===document.getElementById('mwrap'))closeMod2();}
+function closeMod2(){document.getElementById('mwrap').classList.remove('on');}
+
+function addCampo(){
+  alert('Para agregar un campo manualmente, usá la API POST /api/campos desde Postman o contactá al administrador.');
+}
+
+// ============================================================
+// LOGOUT
+// ============================================================
+async function doLogout(){
+  await fetch('/logout');
+  window.location.href='/login';
+}
+
+// ============================================================
+// ARRANCAR
+// ============================================================
+init();
+</script>
+</body>
+</html>
