@@ -41,7 +41,7 @@ async function doLogin(){
   const password=document.getElementById('password').value;
   const r=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
   const d=await r.json();
-  if(d.ok){window.location.href='/';}
+  if(d.ok){window.location.if(d.ok){window.location.href='/dashboard';}href='/';}
   else{const el=document.getElementById('error-msg');el.textContent=d.msg;el.style.display='block';}
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
